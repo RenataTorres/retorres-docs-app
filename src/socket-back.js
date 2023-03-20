@@ -16,8 +16,6 @@ const documents = [
 ]
 
 io.on('connection', (socket) => {
-  console.log('Um cliente se conectou ID ', socket.id);
-
   socket.on('select_document', (documentName, returnText) => {
     socket.join(documentName);
 
