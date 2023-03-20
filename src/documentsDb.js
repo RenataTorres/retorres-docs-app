@@ -4,8 +4,23 @@ function findDocuments(name) {
     return collectionDocuments.findOne({name});
 };
 
+function getDocuments() {
+    return collectionDocuments.find().toArray();
+}
+
+function addDocument(name) {
+    return collectionDocuments.insertOne({
+        name,
+        text: ''
+    });
+}
+
 function updateDocuments(name, text) {
     return collectionDocuments.updateOne({name}, {$set: { text }});
 };
 
-export { findDocuments, updateDocuments };
+function deleteDocument(name) {
+    return collectionDocuments.deleteOne({name})
+}
+
+export { findDocuments, updateDocuments, getDocuments, addDocument, deleteDocument };
