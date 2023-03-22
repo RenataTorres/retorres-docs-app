@@ -1,8 +1,16 @@
 import { emitAddDocument } from './socket-front-index.js';
+import { deleteCookie, getCookie } from './utils/cookies.js';
 
+const tokenJwt = getCookie('tokenJwt');
+console.log(tokenJwt);
 const documentsList = document.getElementById('lista-documentos');
 const form = document.getElementById('form-adiciona-documento');
 const inputDocument = document.getElementById('input-documento');
+const logoutButton = document.getElementById('botao-logout')
+
+logoutButton.addEventListener('click', () => {
+  deleteCookie('tokenJwt');
+})
 
 form.addEventListener('submit', (event) => {
   event.preventDefault()
