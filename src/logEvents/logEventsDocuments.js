@@ -28,13 +28,17 @@ function logEventsDocuments(socket, io) {
     }
   });
 
+  socket.on('disconnect', () => {
+    console.log(`Cliente ${socket.id} foi desconectado`);
+  });
+
   socket.on('delete_document', async (documentName) => {
     const result = await deleteDocument(documentName);
     
     if(result.deletedCount){
       io.emit('delete_document_success', documentName);
     }
-  })
+  });
 }
 
 export default logEventsDocuments;

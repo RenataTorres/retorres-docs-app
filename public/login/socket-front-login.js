@@ -12,6 +12,7 @@ socket.on('authenticate_success', (tokenJwt) => {
   alert('Usuário logado com sucesso!');
   window.location.href = '/';
 });
+
 socket.on('authenticate_error', () => alert('Erro ao logar!'));
 socket.on('user_not_found', () => alert('Usuário ainda não realizou cadastro!'));
 
