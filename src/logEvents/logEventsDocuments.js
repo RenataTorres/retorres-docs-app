@@ -18,26 +18,26 @@ function logEventsDocuments(socket, io) {
 
       returnText(document.text)
     }
-  });
+
+    socket.on('editor_text', async ({ text, documentName }) => {
+      const updatedDocument = await updateDocuments(documentName, text);
   
-  socket.on('editor_text', async ({ text, documentName }) => {
-    const updatedDocument = await updateDocuments(documentName, text);
+      if(updatedDocument.modifiedCount) {
+        socket.to(documentName).emit('editor_text_clients', text);
+      }
+    });
+  
+    socket.on('delete_document', async (documentName) => {
+      const result = await deleteDocument(documentName);
+      
+      if(result.deletedCount){
+        io.emit('delete_document_success', documentName);
+      }
+    });
 
-    if(updatedDocument.modifiedCount) {
-      socket.to(documentName).emit('editor_text_clients', text);
-    }
-  });
-
-  socket.on('disconnect', () => {
-    console.log(`Cliente ${socket.id} foi desconectado`);
-  });
-
-  socket.on('delete_document', async (documentName) => {
-    const result = await deleteDocument(documentName);
-    
-    if(result.deletedCount){
-      io.emit('delete_document_success', documentName);
-    }
+    socket.on('disconnect', () => {
+      console.log(`Cliente ${socket.id} foi desconectado`);
+    });
   });
 }
 
