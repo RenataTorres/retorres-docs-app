@@ -10,6 +10,8 @@ const logoutButton = document.getElementById('botao-logout')
 
 logoutButton.addEventListener('click', () => {
   deleteCookie('tokenJwt');
+  alert('Usuário deslogado com sucesso!');
+  window.location.href = '/login/index.html';
 })
 
 form.addEventListener('submit', (event) => {

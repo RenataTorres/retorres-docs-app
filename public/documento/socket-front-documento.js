@@ -1,12 +1,26 @@
-import { alertAndRedirect, updateEditorText } from "./documento.js";
+import { getCookie } from "../utils/cookies.js";
+import { alertAndRedirect, treatAuthorizationSuccess, updateEditorText, updateUsersInterface } from "./documento.js";
 
-const socket = io();
+const socket = io('/users',{
+  auth: {
+      token: getCookie('tokenJwt')
+  }
+});
 
-function selectDocument(name) {
-  socket.emit('select_document', name, (text) => {
+socket.on('authorization_success', treatAuthorizationSuccess);
+
+socket.on('connect_error', (error) => {
+  alert(error);
+  window.location.href = '/login//index.html';
+})
+
+function selectDocument(inputData) {
+  socket.emit('select_document', inputData, (text) => {
     updateEditorText(text);
   });
 }
+
+socket.on('users_in_document', updateUsersInterface)
 
 function emitEditorText(data) {
   socket.emit('editor_text', data);

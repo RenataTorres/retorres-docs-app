@@ -1,21 +1,27 @@
-import { deleteDocument, updateDocuments } from "../db/documentsDb.js";
+import { addDocument, getDocuments} from "../db/documentsDb.js";
 
 function logEventsInit(socket, io) {
-  socket.on('editor_text', async ({ text, documentName }) => {
-    const updatedDocument = await updateDocuments(documentName, text);
 
-    if(updatedDocument.modifiedCount) {
-      socket.to(documentName).emit('editor_text_clients', text);
-    }
+  socket.on('get_documents', async (returnedDocuments) => {
+    const documents = await getDocuments();
+
+    returnedDocuments(documents)
   });
 
-  socket.on('delete_document', async (documentName) => {
-    const result = await deleteDocument(documentName);
-    
-    if(result.deletedCount){
-      io.emit('delete_document_success', documentName);
+  socket.on('add_document', async ( documentName ) => {
+    const existDocument = (await findDocuments(documentName)) !== null;
+
+    if(existDocument) {
+      socket.emit('exist_document', documentName);
+    }else {
+
+      const result = await addDocument(documentName);
+  
+      if(result.acknowledged) {
+        io.emit('add_document_interface', documentName);
+      }
     }
-  })
+  });
 }
 
 export default logEventsInit;

@@ -1,37 +1,40 @@
-import { addDocument, findDocuments, getDocuments } from "../db/documentsDb.js";
+import { findDocuments, deleteDocument, updateDocuments } from "../db/documentsDb.js";
+import { addConnection, getUsersDocument } from "../utils/connectionsDocuments.js";
 
 function logEventsDocuments(socket, io) {
-  socket.on('get_documents', async (returnedDocuments) => {
-    const documents = await getDocuments();
-
-    returnedDocuments(documents)
-  });
-
-  socket.on('add_document', async ( documentName ) => {
-    const existDocument = (await findDocuments(documentName)) !== null;
-
-    if(existDocument) {
-      socket.emit('exist_document', documentName);
-    }else {
-
-      const result = await addDocument(documentName);
-  
-      if(result.acknowledged) {
-        io.emit('add_document_interface', documentName);
-      }
-    }
-  });
-
-  socket.on('select_document', async (documentName, returnText) => {
-    //joga o cliente em uma sala
-    socket.join(documentName);
-
+  socket.on('select_document', async ({documentName, userName}, returnText) => {
+    
     const document = await findDocuments(documentName);
-
+    
     if(document) {
+      //joga o cliente em uma sala
+      socket.join(documentName);
+
+      addConnection({ documentName, userName });
+
+      const usersInDocument = getUsersDocument(documentName);
+
+      io.to(documentName).emit('users_in_document', usersInDocument);
+
       returnText(document.text)
     }
   });
+  
+  socket.on('editor_text', async ({ text, documentName }) => {
+    const updatedDocument = await updateDocuments(documentName, text);
+
+    if(updatedDocument.modifiedCount) {
+      socket.to(documentName).emit('editor_text_clients', text);
+    }
+  });
+
+  socket.on('delete_document', async (documentName) => {
+    const result = await deleteDocument(documentName);
+    
+    if(result.deletedCount){
+      io.emit('delete_document_success', documentName);
+    }
+  })
 }
 
 export default logEventsDocuments;

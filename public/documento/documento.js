@@ -6,10 +6,23 @@ const documentName = params.get('nome');
 const editorText = document.getElementById('editor-texto');
 const documentTitle = document.getElementById('titulo-documento');
 const deleteButton = document.getElementById('excluir-documento');
+const usersConnectedList = document.getElementById('usuarios-conectados');
 
 documentTitle.textContent = documentName || 'Documento sem título';
 
-selectDocument(documentName);
+function treatAuthorizationSuccess(payloadToken) {
+    selectDocument({ documentName, userName: payloadToken.userName });
+};
+
+function updateUsersInterface(usersInDocument) {
+    usersConnectedList.innerHTML = '';
+
+    usersInDocument.forEach(user => {
+        usersConnectedList.innerHTML += `
+            <li class="list-group-item">${user}</li>
+        `;
+    });
+}
 
 editorText.addEventListener('keyup', () => {
     emitEditorText({
@@ -33,4 +46,4 @@ function alertAndRedirect(name) {
     }
 }
 
-export { updateEditorText, alertAndRedirect };
+export { updateEditorText, alertAndRedirect, treatAuthorizationSuccess, updateUsersInterface };

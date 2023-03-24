@@ -6,13 +6,16 @@ import logEventsRegister from "./logEvents/logEventsRegister.js";
 import logEventsLogin from "./logEvents/logEventsLogin.js";
 import authorizeUser from './midllewares/authorizeUser.js';
 
-io.use(authorizeUser);
+const nspUsers = io.of('users');
 
-io.on('connection', (socket) => {
+nspUsers.use(authorizeUser);
 
+nspUsers.on('connection', (socket) => {
+  logEventsInit(socket, nspUsers);
+  logEventsDocuments(socket, nspUsers);
+});
+
+io.of('/').on('connection', (socket) => {
   logEventsRegister(socket, io);
   logEventsLogin(socket, io);
-  logEventsInit(socket, io);
-  logEventsDocuments(socket, io);
-
 });

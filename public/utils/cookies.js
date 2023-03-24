@@ -11,8 +11,8 @@ function getCookie(key){
 
 function deleteCookie(key) {
   document.cookie = `${key}=; expires=Thu, 01 Jan 1970 00:00:00`;
-  alert('Usuário deslogado com sucesso!');
-  window.location.href = '/login/index.html';
+  //alert('Usuário deslogado com sucesso!');
+  //window.location.href = '/login/index.html';
 }
 
 export { setCookies, getCookie, deleteCookie };
