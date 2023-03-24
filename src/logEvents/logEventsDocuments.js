@@ -1,16 +1,24 @@
 import { findDocuments, deleteDocument, updateDocuments } from "../db/documentsDb.js";
-import { addConnection, getUsersDocument } from "../utils/connectionsDocuments.js";
+import { addConnection, findConnection, getUsersDocument, removeConnection } from "../utils/connectionsDocuments.js";
 
 function logEventsDocuments(socket, io) {
   socket.on('select_document', async ({documentName, userName}, returnText) => {
-    
     const document = await findDocuments(documentName);
     
     if(document) {
+      const connectionFound = findConnection(documentName, userName);
+
+      if(connectionFound){
+        socket.emit('user_already_in_document')
+      }
       //joga o cliente em uma sala
       socket.join(documentName);
 
       addConnection({ documentName, userName });
+
+      socket.data = {
+        userEntered: true,
+      }
 
       const usersInDocument = getUsersDocument(documentName);
 
@@ -36,7 +44,13 @@ function logEventsDocuments(socket, io) {
     });
 
     socket.on('disconnect', () => {
-      console.log(`Cliente ${socket.id} foi desconectado`);
+      if(socket.data.userEntered){
+        removeConnection(documentName, userName);
+  
+        const usersInDocument = getUsersDocument(documentName);
+  
+        io.to(documentName).emit('users_in_document', usersInDocument);
+      }
     });
   });
 }

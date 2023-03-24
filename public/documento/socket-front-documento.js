@@ -12,7 +12,7 @@ socket.on('authorization_success', treatAuthorizationSuccess);
 socket.on('connect_error', (error) => {
   alert(error);
   window.location.href = '/login//index.html';
-})
+});
 
 function selectDocument(inputData) {
   socket.emit('select_document', inputData, (text) => {
@@ -20,7 +20,12 @@ function selectDocument(inputData) {
   });
 }
 
-socket.on('users_in_document', updateUsersInterface)
+socket.on('user_already_in_document', () => {
+  alert('Documento já aberto em outra página');
+  window.location.href = '/';
+});
+
+socket.on('users_in_document', updateUsersInterface);
 
 function emitEditorText(data) {
   socket.emit('editor_text', data);
@@ -36,6 +41,6 @@ function emitDeleteDocument(name) {
 
 socket.on('delete_document_success', (name) => {
   alertAndRedirect(name);
-})
+});
 
 export { emitEditorText, selectDocument, emitDeleteDocument };
